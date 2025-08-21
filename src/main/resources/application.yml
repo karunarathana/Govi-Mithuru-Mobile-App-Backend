@@ -1,0 +1,3 @@
+service:
+  jwt:
+    secretKey: "yZqrMy2UifuCZphuWRtAbAX/61C1u6MNJbh+WBZGyoo="
