@@ -79,7 +79,6 @@ public class UserServiceImpl implements UserService {
     }
 
     public LoginResponse validateUser(LoginDto loginDto) {
-        // Password = "Maheesha123"
         logger.info("Method Executing Starting In validateUser");
         LoginResponse response = new LoginResponse();
         Optional<UserEntity> byUserEmail = userRepo.findByUserEmail(loginDto.getUserEmail());
@@ -93,6 +92,7 @@ public class UserServiceImpl implements UserService {
                     response.setNewAccessToken(newAccessToken);
                     response.setNewRefreshToken(newRefreshToken);
                     response.setUsername(byUserEmail.get().getUserName());
+                    response.setUserRole(byUserEmail.get().getRole());
                     return response;
                 } else {
                     response.setMessage("User password is incorrect: ");

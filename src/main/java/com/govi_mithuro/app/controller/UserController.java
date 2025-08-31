@@ -19,7 +19,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping(APIConstants.API_ROOT)
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin
 public class UserController {
     private final JwtService jwtService;
     private final UserService userService;
@@ -81,5 +81,9 @@ public class UserController {
         logger.info("Request Started In deleteSingleUser |userId={} ", userId);
         String response = userService.deleteUser(userId);
         return new ResponseEntity<>(response,HttpStatus.OK);
+    }
+    @RequestMapping(value = APIConstants.GENERATE_NEW_ACCESS_TOKEN, method = RequestMethod.POST)
+    public String generateNewAccessToken(@RequestParam String userName){
+        return jwtService.generateAccessToken(userName);
     }
 }
