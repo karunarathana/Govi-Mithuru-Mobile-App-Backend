@@ -9,15 +9,23 @@ import com.govi_mithuro.app.response.login.LoginResponse;
 import com.govi_mithuro.app.response.user.CreateUserResponse;
 import com.govi_mithuro.app.services.JwtService;
 import com.govi_mithuro.app.services.UserService;
+import jakarta.mail.MessagingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import jakarta.mail.internet.MimeMessage;
+import org.thymeleaf.context.Context;
+import org.thymeleaf.TemplateEngine;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -25,11 +33,16 @@ public class UserServiceImpl implements UserService {
     private final UserRepo userRepo;
     private final BCryptPasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final JavaMailSender javaMailSender;
+    private final TemplateEngine templateEngine;
 
-    public UserServiceImpl(UserRepo userRepo, BCryptPasswordEncoder passwordEncoder, JwtService jwtService) {
+
+    public UserServiceImpl(UserRepo userRepo, BCryptPasswordEncoder passwordEncoder, JwtService jwtService, JavaMailSender javaMailSender, TemplateEngine templateEngine) {
         this.userRepo = userRepo;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
+        this.javaMailSender = javaMailSender;
+        this.templateEngine = templateEngine;
     }
 
 
@@ -128,6 +141,79 @@ public class UserServiceImpl implements UserService {
         userRepo.deleteById(userId);
         logger.info("Method Executing Completed In deleteUser | userId={}", userId);
         return "User Deleted Successfully";
+    }
+
+    @Override
+    public String getUserOTPCode(String email,String otpCode) {
+        logger.info("Method execution stared in getUserOtpCode |email={}",email);
+        Optional<UserEntity> byUserEmail = userRepo.findByUserEmail(email);
+        if (byUserEmail.get().getOTPCode().equals(otpCode)){
+            return "OTP Verification SuccessFully";
+        }
+        logger.info("Methode execution completed in getUserOtpCode |otp={}",otpCode);
+        return "Error Verification";
+    }
+
+    @Override
+    public String sendOtpCodeToUserEmail(String email) {
+        final String emailSubject = "Password Verification Code";
+        String sixCodeOtp = generateSixNumberOTPCode();
+        Optional<UserEntity> byUserEmail = userRepo.findByUserEmail(email);
+        if (byUserEmail.isPresent()){
+            String userName = byUserEmail.get().getUserName();
+            if(sendHtmlEmail(email, emailSubject, sixCodeOtp,userName)){
+                userRepo.updateOTPCode(email,sixCodeOtp);
+                return "Email Send Successfully";
+            }
+            return "Email Send Failed "+email;
+        }
+        return "User Email Not Found Our System "+email;
+
+    }
+
+
+    private String generateSixNumberOTPCode() {
+        Random random = new Random();
+        int otp = 100000 + random.nextInt(900000); // range: 100000–999999
+        return String.valueOf(otp);
+    }
+
+
+    public boolean sendHtmlEmail(String to,String subject,String body,String userName){
+        MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+        try {
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage,true,"UTF-8");
+            Context context = new Context();
+            context.setVariable("username",userName);
+            context.setVariable("message",body);
+            String htmlBody = templateEngine.process("otpTemplate",context);
+
+            helper.setTo(to);
+            helper.setSubject(subject);
+            helper.setText(htmlBody,true);
+
+            javaMailSender.send(mimeMessage);
+            return true;
+        } catch (MessagingException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+    public boolean sendEmail(String to,String subject,String body){
+        logger.info("Method execution started sendEmail");
+        try{
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setTo(to);
+            message.setSubject(subject);
+            message.setText(body);
+
+            javaMailSender.send(message);
+            logger.info("Method execution end sendEmail,"+body);
+            return true;
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Cacheable(value = "user",key = "#userId")

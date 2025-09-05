@@ -15,6 +15,7 @@ public class UserEntity implements Serializable {
     private String email;
     private String password;
     private String role;
+    private String OTPCode;
 
     public String getRole() {
         return role;
@@ -54,5 +55,13 @@ public class UserEntity implements Serializable {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getOTPCode() {
+        return OTPCode;
+    }
+
+    public void setOTPCode(String OTPCode) {
+        this.OTPCode = OTPCode;
     }
 }

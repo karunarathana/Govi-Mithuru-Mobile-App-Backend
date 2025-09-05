@@ -86,4 +86,25 @@ public class UserController {
     public String generateNewAccessToken(@RequestParam String userName){
         return jwtService.generateAccessToken(userName);
     }
+    @RequestMapping(value = APIConstants.SEND_OTP_EMAIL, method = RequestMethod.GET)
+    public ResponseEntity<?> requestUserOTPCode(@RequestParam String userEmail){
+        logger.info("Request Start in getUserOTPCode |email = {}",userEmail);
+        String message = userService.sendOtpCodeToUserEmail(userEmail);
+        logger.info("Request Completed In getUserOTPCode |Message={}",message);
+        return ResponseEntity.ok(Map.of(
+                "Status", "Successfully",
+                "Message", message
+        ));
+    }
+    @RequestMapping(value = APIConstants.GET_OTP, method = RequestMethod.GET)
+    public ResponseEntity<?> checkUserEnteredOTPCode(@RequestParam String userEmail,@RequestParam String otpCode){
+        logger.info("Request Start in checkUserEnteredOTPCode |email = {}",userEmail);
+        String message = userService.getUserOTPCode(userEmail,otpCode);
+        logger.info("Request Completed In checkUserEnteredOTPCode |Message={}",message);
+        return ResponseEntity.ok(Map.of(
+                "Status", "Successfully",
+                "Message", message
+        ));
+    }
+
 }

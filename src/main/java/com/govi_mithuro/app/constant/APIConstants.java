@@ -12,6 +12,9 @@ public class APIConstants {
     public static final String REFRESH_ACCESS_TOKEN = "/auth/refresh-token";
     public static final String GENERATE_NEW_ACCESS_TOKEN = "/auth/new-access-token";
     public static final String FORGOT_PASSWORD = "/auth/forgot";
+    public static final String GET_OTP = "/getOtp";
+    public static final String SEND_OTP_EMAIL = "/send-otp-code";
+
 
     // Product api list
 

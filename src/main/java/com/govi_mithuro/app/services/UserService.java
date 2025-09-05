@@ -15,4 +15,7 @@ public interface UserService {
     String forgotPassword(String userEmail,String newPassword);
     List<UserEntity> getAllUsers();
     String deleteUser(int userId);
+    String getUserOTPCode(String email,String otpCode);
+    String sendOtpCodeToUserEmail(String email);
+
 }

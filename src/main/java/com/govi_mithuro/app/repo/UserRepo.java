@@ -20,4 +20,9 @@ public interface UserRepo extends JpaRepository<UserEntity,Integer> {
     @Query(value = "UPDATE t_user SET password = :password WHERE email = :userEmail", nativeQuery = true)
     void updateUserPassword(String userEmail,String password);
 
+    @Modifying
+    @Transactional
+    @Query(value = "UPDATE t_user SET otpcode = :otpCode WHERE email = :userEmail", nativeQuery = true)
+    void updateOTPCode(String userEmail,String otpCode);
+
 }
