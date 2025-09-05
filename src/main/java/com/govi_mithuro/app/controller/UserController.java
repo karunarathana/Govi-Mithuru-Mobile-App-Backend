@@ -19,7 +19,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping(APIConstants.API_ROOT)
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin
 public class UserController {
     private final JwtService jwtService;
     private final UserService userService;
@@ -82,4 +82,29 @@ public class UserController {
         String response = userService.deleteUser(userId);
         return new ResponseEntity<>(response,HttpStatus.OK);
     }
+    @RequestMapping(value = APIConstants.GENERATE_NEW_ACCESS_TOKEN, method = RequestMethod.POST)
+    public String generateNewAccessToken(@RequestParam String userName){
+        return jwtService.generateAccessToken(userName);
+    }
+    @RequestMapping(value = APIConstants.SEND_OTP_EMAIL, method = RequestMethod.GET)
+    public ResponseEntity<?> requestUserOTPCode(@RequestParam String userEmail){
+        logger.info("Request Start in getUserOTPCode |email = {}",userEmail);
+        String message = userService.sendOtpCodeToUserEmail(userEmail);
+        logger.info("Request Completed In getUserOTPCode |Message={}",message);
+        return ResponseEntity.ok(Map.of(
+                "Status", "Successfully",
+                "Message", message
+        ));
+    }
+    @RequestMapping(value = APIConstants.GET_OTP, method = RequestMethod.GET)
+    public ResponseEntity<?> checkUserEnteredOTPCode(@RequestParam String userEmail,@RequestParam String otpCode){
+        logger.info("Request Start in checkUserEnteredOTPCode |email = {}",userEmail);
+        String message = userService.getUserOTPCode(userEmail,otpCode);
+        logger.info("Request Completed In checkUserEnteredOTPCode |Message={}",message);
+        return ResponseEntity.ok(Map.of(
+                "Status", "Successfully",
+                "Message", message
+        ));
+    }
+
 }

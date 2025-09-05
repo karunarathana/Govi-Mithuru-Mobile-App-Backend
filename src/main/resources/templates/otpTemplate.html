@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OTP Code Email</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #eafaf1; /* Light green background */
+            color: #333333;
+        }
+        .email-container {
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .email-header {
+            background-color: #28a745; /* Green header */
+            color: white;
+            text-align: center;
+            padding: 20px;
+            font-size: 24px;
+        }
+        .email-body {
+            padding: 20px;
+            text-align: center;
+            line-height: 1.6;
+        }
+        .otp-code {
+            font-size: 28px;
+            font-weight: bold;
+            color: #28a745; /* Green OTP */
+            margin: 20px 0;
+        }
+        .email-footer {
+            background-color: #f4f4f4;
+            text-align: center;
+            padding: 10px;
+            font-size: 14px;
+            color: #777777;
+        }
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            color: #ffffff;
+            background-color: #28a745; /* Green button */
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        .button:hover {
+            background-color: #218838; /* Darker green */
+        }
+    </style>
+</head>
+<body>
+<div class="email-container">
+    <!-- Header -->
+    <div class="email-header">
+        Govi Mithuro
+    </div>
+
+    <!-- Body -->
+    <div class="email-body">
+        <h1>Verify Your Account</h1>
+        <p>Hi <span th:text="${username}">User</span>,</p>
+        <p>We received a request to verify your email address. Use the OTP code below to proceed:</p>
+        <div class="otp-code" th:text="${message}">123456</div>
+        <p>This OTP code is valid for <strong>10 minutes</strong>.</p>
+        <p>If you didn’t request this code, you can ignore this email.</p>
+        <a href="#" class="button">Verify Now</a>
+    </div>
+
+    <!-- Footer -->
+    <div class="email-footer">
+        &copy; 2024 Govi Mithuro. All rights reserved.<br>
+        <a href="#">Privacy Policy</a> | <a href="#">Help Center</a>
+    </div>
+</div>
+</body>
+</html>

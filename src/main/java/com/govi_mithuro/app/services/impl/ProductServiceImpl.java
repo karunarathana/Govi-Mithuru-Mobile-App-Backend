@@ -8,7 +8,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -25,10 +27,10 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public String addNewProduct(ProductDto productDto) {
+    public String addNewProduct(MultipartFile file, ProductDto productDto) throws IOException {
         logger.info("Method Executing Start In addNewProduct |productDto={}", productDto);
-        ProductEntity savedResponse = productRepo.save(convertProductToProductEntity(0, productDto, "Create"));
-        if (savedResponse != null && savedResponse.getProductID() != null) {
+        ProductEntity savedResponse = productRepo.save(convertProductToProductEntity(0, productDto, file, "Create"));
+        if (savedResponse.getProductID() != null) {
             redisTemplate.opsForValue().set(String.valueOf(savedResponse.getProductID()), productDto);
             logger.info("Product saved successfully: " + savedResponse.getProductID());
             return "Product saved successfully";
@@ -37,35 +39,20 @@ public class ProductServiceImpl implements ProductService {
         return "Failed to save product: " + savedResponse.getProductID();
     }
 
-    private ProductEntity convertProductToProductEntity(int updateId, ProductDto productDto, String methodName) {
+    private ProductEntity convertProductToProductEntity(int updateId, ProductDto productDto,MultipartFile file, String methodName) throws IOException {
         logger.info("Method Executing Start In convertProductToProductEntity |productDto={}", productDto);
         ProductEntity productEntity = new ProductEntity();
         if (methodName.equals("Create")) {
             productEntity.setProductName(productDto.getProductName());
-            productEntity.setProductDescription(productDto.getProductDescription());
             productEntity.setProductPrice(productDto.getProductPrice());
-            productEntity.setDiscountPrice(productDto.getDiscountPrice());
-            productEntity.setLastPrice(productDto.getLastPrice()); // productPrice - discountPrice
-            productEntity.setBrandName(productDto.getBrandName());
             productEntity.setProductCreateData(new Date(System.currentTimeMillis()));
             productEntity.setProductCategory(productDto.getProductCategory());
-            productEntity.setProductColor(productDto.getProductColor());
-            productEntity.setOthers(productDto.getOthers());
-            productEntity.setProductStock(productDto.getProductStock());
-            productEntity.setWarrantyPeriod(productDto.getWarrantyPeriod().concat("Year"));
+            productEntity.setPlaceImageData(file.getBytes());
         } else if (methodName.equals("Update")) {
             productEntity.setProductName(productDto.getProductName());
-            productEntity.setProductDescription(productDto.getProductDescription());
             productEntity.setProductPrice(productDto.getProductPrice());
-            productEntity.setDiscountPrice(productDto.getDiscountPrice());
-            productEntity.setLastPrice(productDto.getLastPrice()); // productPrice - discountPrice
-            productEntity.setBrandName(productDto.getBrandName());
             productEntity.setProductCreateData(new Date(System.currentTimeMillis()));
             productEntity.setProductCategory(productDto.getProductCategory());
-            productEntity.setProductColor(productDto.getProductColor());
-            productEntity.setOthers(productDto.getOthers());
-            productEntity.setProductStock(productDto.getProductStock());
-            productEntity.setWarrantyPeriod(productDto.getWarrantyPeriod().concat("Year"));
         } else {
             logger.info("Invalid method name");
         }
@@ -76,9 +63,9 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public String updateProductById(int id, ProductDto productDto) {
+    public String updateProductById(int id, ProductDto productDto,MultipartFile file) throws IOException {
         logger.info("Method Executing Start In updateProductById |id={} |productDto={}", id, productDto);
-        ProductEntity productEntity = convertProductToProductEntity(id, productDto, "Update");
+        ProductEntity productEntity = convertProductToProductEntity(id, productDto, file,"Update");
         ProductEntity updateProduct = productRepo.save(productEntity);
         logger.info("Method Executing Completed In updateProductById |response={}", updateProduct);
         return "Update Successfully";
