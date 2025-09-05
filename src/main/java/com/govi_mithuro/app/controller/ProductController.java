@@ -59,8 +59,11 @@ public class ProductController {
     }
 
     @RequestMapping(value = APIConstants.UPDATE_SINGLE_PRODUCT, method = RequestMethod.POST)
-    public ResponseEntity<?> updateProductById(@PathVariable int id, @RequestBody ProductDto productDto, MultipartFile file) throws IOException {
+    public ResponseEntity<?> updateProductById( @RequestParam("id") int id, @RequestParam("product") String productJson, @RequestPart(value = "image", required = false) MultipartFile file) throws IOException {
+        // Convert JSON string to DTO
+        ProductDto productDto = objectMapper.readValue(productJson, ProductDto.class);
         logger.info("Request Started In updateProductById |id={} |productDto={}", id, productDto);
+        System.out.println(id);
         String response = productService.updateProductById(id, productDto, file);
         logger.info("Request Complete In updateProductById |response={} ", response);
         return ResponseEntity.ok(Map.of(
@@ -71,8 +74,9 @@ public class ProductController {
     }
 
     @RequestMapping(value = APIConstants.DELETE_SINGLE_PRODUCT, method = RequestMethod.DELETE)
-    public ResponseEntity<?> deleteProductById(@PathVariable int id) {
+    public ResponseEntity<?> deleteProductById(@RequestParam("id") int id) {
         logger.info("Request Started In deleteProductById |id={}", id);
+        System.out.println(id);
         String response = productService.deleteProductById(id);
         logger.info("Request Complete In deleteProductById |response={} ", response);
         return ResponseEntity.ok(Map.of(

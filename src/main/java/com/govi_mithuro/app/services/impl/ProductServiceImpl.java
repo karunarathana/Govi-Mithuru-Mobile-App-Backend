@@ -49,6 +49,7 @@ public class ProductServiceImpl implements ProductService {
             productEntity.setProductCategory(productDto.getProductCategory());
             productEntity.setPlaceImageData(file.getBytes());
         } else if (methodName.equals("Update")) {
+            productEntity.setProductID(updateId);
             productEntity.setProductName(productDto.getProductName());
             productEntity.setProductPrice(productDto.getProductPrice());
             productEntity.setProductCreateData(new Date(System.currentTimeMillis()));
@@ -57,7 +58,7 @@ public class ProductServiceImpl implements ProductService {
             logger.info("Invalid method name");
         }
 
-        logger.info("Method Executing Completed In convertProductToProductEntity |productEntity={}", productEntity);
+        logger.info("Method Executing Completed In convertProductToProductEntity |productEntity={}", productEntity.getProductID());
         return productEntity;
 
     }
@@ -65,6 +66,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public String updateProductById(int id, ProductDto productDto,MultipartFile file) throws IOException {
         logger.info("Method Executing Start In updateProductById |id={} |productDto={}", id, productDto);
+        System.out.println("for test"+productDto.getProductName()+" "+id);
         ProductEntity productEntity = convertProductToProductEntity(id, productDto, file,"Update");
         ProductEntity updateProduct = productRepo.save(productEntity);
         logger.info("Method Executing Completed In updateProductById |response={}", updateProduct);
