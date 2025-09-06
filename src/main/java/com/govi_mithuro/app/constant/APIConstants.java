@@ -24,4 +24,10 @@ public class APIConstants {
     public static final String UPDATE_SINGLE_PRODUCT = "/update-product";
     public static final String GET_UNIQUE_PRODUCTS = "/get-product-by-category";
     public static final String VIEW_ALL_PRODUCT_BY_CATEGORY = "/view-product-by-category";
+
+    //Message API List
+    public static final String ADD_NEW_MESSAGE = "/add-message";
+    public static final String DELETE_MESSAGE = "/delete-message";
+    public static final String VIEW_MESSAGE = "/view-message";
+
 }
